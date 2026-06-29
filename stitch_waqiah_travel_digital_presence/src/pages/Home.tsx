@@ -51,9 +51,12 @@ export default function Home() {
           <img
             src="/hero-makkah.png"
             alt=""
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-cover object-[70%_center] sm:object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface/85 via-surface/55 to-surface/0" />
+          {/* mobile: light top fade — keeps the heading readable while the Kaaba stays visible below */}
+          <div className="absolute inset-0 bg-gradient-to-b from-surface/85 via-surface/35 to-surface/10 sm:hidden" />
+          {/* desktop: directional fade — text lives on the left */}
+          <div className="absolute inset-0 hidden sm:block bg-gradient-to-r from-surface/85 via-surface/55 to-surface/0" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
         </div>
 
