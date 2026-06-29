@@ -73,7 +73,7 @@ export const PACKAGES: TravelPackage[] = [
     hotel: "Pullman ZamZam Makkah & Madinah Mövenpick",
     distance: "Haram-facing · 0 min walk",
     image:
-      "/hero-makkah.jpg",
+      "/hero-makkah.png",
     highlights: ["Connecting family rooms", "Child-friendly itinerary", "Flexible departure dates", "Dedicated coordinator"],
   },
   {

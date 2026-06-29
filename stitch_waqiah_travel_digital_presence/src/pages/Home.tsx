@@ -49,11 +49,11 @@ export default function Home() {
       <section className="relative isolate overflow-hidden pb-28 pt-28 lg:pb-40 lg:pt-36">
         <div className="absolute inset-0 -z-10">
           <img
-            src="/hero-makkah.jpg"
+            src="/hero-makkah.png"
             alt=""
             className="h-full w-full object-cover object-center"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/85 to-surface/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-surface/85 via-surface/55 to-surface/0" />
           <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
         </div>
 
