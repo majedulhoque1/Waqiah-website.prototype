@@ -1,0 +1,9 @@
+# Browser-test / scratch artifacts (created during local verification)
+.playwright-mcp/
+*-check.jpeg
+*-final.jpeg
+img-sheet.jpg
+
+# OS
+.DS_Store
+Thumbs.db

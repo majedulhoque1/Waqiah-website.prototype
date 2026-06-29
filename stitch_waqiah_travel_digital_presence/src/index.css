@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-surface text-ink font-sans antialiased;
+    font-feature-settings: "kern", "liga";
+  }
+
+  h1, h2, h3, h4, h5 {
+    @apply font-display text-navy;
+    text-wrap: balance;
+  }
+
+  ::selection {
+    @apply bg-primary text-white;
+  }
+
+  /* Numeric alignment for prices & schedules (DESIGN.md) */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Respect reduced-motion preference globally */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  /* Page horizontal rhythm: 16px mobile → 64px desktop safe margins */
+  .container-px {
+    @apply mx-auto w-full max-w-content px-4 sm:px-6 lg:px-16;
+  }
+
+  /* Glassmorphic navigation surface (DESIGN.md) */
+  .glass {
+    @apply bg-surface/80 backdrop-blur-xl backdrop-saturate-150;
+  }
+
+  /* Brand gradient text accent */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-primary-deep bg-clip-text text-transparent;
+  }
+
+  .section-pad {
+    @apply py-16 sm:py-20 lg:py-28;
+  }
+}
