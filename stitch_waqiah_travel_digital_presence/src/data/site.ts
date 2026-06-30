@@ -10,8 +10,7 @@ export const SITE = {
     line2: "Woodside, NY 11377",
   },
   phones: ["718 361 0110", "646 520 9507"],
-  // NOTE: placeholder email — confirm the agency's real address before launch.
-  email: "info@waqiahtravel.com",
+  email: "waqiahtravels@gmail.com",
   hours: "Mon–Sat · 9:00 AM – 7:00 PM (EST)",
   rating: { score: "4.6", source: "Google" },
 } as const;

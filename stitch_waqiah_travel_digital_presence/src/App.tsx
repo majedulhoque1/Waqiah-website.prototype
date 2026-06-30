@@ -8,6 +8,7 @@ import Visa from "./pages/Visa";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import PlanWithAI from "./pages/PlanWithAI";
+import AdminLogin from "./pages/AdminLogin";
 import NotFound from "./pages/NotFound";
 
 /** Restore scroll to top on every route change. */
@@ -36,6 +37,8 @@ export default function App() {
           <Route path="/plan-with-ai" element={<PlanWithAI />} />
           <Route path="*" element={<NotFound />} />
         </Route>
+        {/* Standalone admin sign-in (no site chrome) */}
+        <Route path="/admin" element={<AdminLogin />} />
       </Routes>
     </>
   );

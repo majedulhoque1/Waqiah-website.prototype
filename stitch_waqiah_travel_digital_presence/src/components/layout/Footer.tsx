@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MapPin, Phone, Mail, Plane } from "lucide-react";
+import { MapPin, Phone, Mail, Plane, Lock } from "lucide-react";
 import { SITE, FOOTER_LINKS } from "../../data/site";
 import Logo from "../ui/Logo";
 
@@ -79,7 +79,13 @@ export default function Footer() {
           <p>
             © {year} {SITE.legalName} · Licensed &amp; Bonded.
           </p>
-          <p className="text-xs uppercase tracking-wider">Crafted for assured peace of mind</p>
+          <Link
+            to="/admin"
+            className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted/60 transition-colors hover:text-primary"
+          >
+            <Lock className="h-3 w-3" aria-hidden="true" />
+            Admin
+          </Link>
         </div>
       </div>
     </footer>
