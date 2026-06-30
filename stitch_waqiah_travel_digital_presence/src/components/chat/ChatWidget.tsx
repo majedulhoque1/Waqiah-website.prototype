@@ -6,9 +6,21 @@ import {
   CHAT_TOPICS,
   WELCOME_QUICK_REPLIES,
   FALLBACK,
-  findTopic,
   type QuickReply,
 } from "../../data/chatResponses";
+
+const BOT_TOKEN = "fe26289350db386bc43e454499593e4112e5d8961d78fb16";
+const BOT_API = "https://aaap-bot-ops.vercel.app";
+
+function getUserId(): string {
+  const key = "waqiah_chat_uid";
+  let id = localStorage.getItem(key);
+  if (!id) {
+    id = crypto.randomUUID();
+    localStorage.setItem(key, id);
+  }
+  return id;
+}
 
 type Msg = {
   id: string;
@@ -34,8 +46,10 @@ export default function ChatWidget() {
   const [msgs, setMsgs] = useState<Msg[]>([WELCOME]);
   const [input, setInput] = useState("");
   const [hasNew, setHasNew] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const conversationId = useRef(crypto.randomUUID());
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,19 +73,77 @@ export default function ChatWidget() {
     if (!open) setHasNew(true);
   }
 
-  function handleSend(text: string) {
+  async function handleSend(text: string) {
     const trimmed = text.trim();
-    if (!trimmed) return;
+    if (!trimmed || isThinking) return;
     setMsgs((prev) => [...prev, { id: uid(), from: "user", text: trimmed }]);
     setInput("");
-    setTimeout(() => {
-      const topic = findTopic(trimmed);
-      if (topic) {
-        pushBot(topic.response, topic.quickReplies);
-      } else {
-        pushBot(FALLBACK.response, FALLBACK.quickReplies, true);
+    setIsThinking(true);
+
+    const botMsgId = uid();
+    setMsgs((prev) => [...prev, { id: botMsgId, from: "bot", text: "…" }]);
+    if (!open) setHasNew(true);
+
+    try {
+      const res = await fetch(`${BOT_API}/api/chat/${BOT_TOKEN}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: trimmed,
+          user_id: getUserId(),
+          conversation_id: conversationId.current,
+        }),
+      });
+
+      if (!res.ok || !res.body) throw new Error("Network error");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            const event = JSON.parse(line.slice(6));
+            if (event.type === "text") {
+              accumulated += event.content;
+              setMsgs((prev) =>
+                prev.map((m) => (m.id === botMsgId ? { ...m, text: accumulated } : m))
+              );
+            } else if (event.type === "error") {
+              setMsgs((prev) =>
+                prev.map((m) =>
+                  m.id === botMsgId
+                    ? { ...m, text: FALLBACK.response, quickReplies: FALLBACK.quickReplies, isFallback: true }
+                    : m
+                )
+              );
+            }
+          } catch {
+            // malformed SSE line — skip
+          }
+        }
       }
-    }, 350);
+    } catch {
+      setMsgs((prev) =>
+        prev.map((m) =>
+          m.id === botMsgId
+            ? { ...m, text: FALLBACK.response, quickReplies: FALLBACK.quickReplies, isFallback: true }
+            : m
+        )
+      );
+    } finally {
+      setIsThinking(false);
+    }
   }
 
   function handleQuickReply(qr: QuickReply) {
@@ -169,12 +241,13 @@ export default function ChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={onKeyDown}
-              placeholder="Type a message…"
-              className="flex-1 bg-transparent text-sm text-ink placeholder:text-muted outline-none"
+              placeholder={isThinking ? "Waqiah is typing…" : "Type a message…"}
+              disabled={isThinking}
+              className="flex-1 bg-transparent text-sm text-ink placeholder:text-muted outline-none disabled:opacity-60"
             />
             <button
               onClick={() => handleSend(input)}
-              disabled={!input.trim()}
+              disabled={!input.trim() || isThinking}
               className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy text-white transition hover:bg-navy-dark disabled:opacity-40 active:scale-95"
               aria-label="Send"
             >
