@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Lock, ArrowLeft, ShieldCheck, AlertCircle, Eye, EyeOff, LogOut, LayoutDashboard } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Lock, ArrowLeft, ShieldCheck, AlertCircle, Eye, EyeOff } from "lucide-react";
 import Logo from "../components/ui/Logo";
 import { cn } from "../lib/utils";
+import { useAdmin } from "../admin/store";
 
 // ⚠️ DEMO-ONLY client-side gate. NOT secure — these values ship in the public
 // bundle. Replace with real server-side auth (e.g. Supabase) in the backend phase.
@@ -10,11 +11,21 @@ const ADMIN_EMAIL = "waqiahtravels@gmail.com";
 const ADMIN_PASSWORD = "Waqiah123";
 
 export default function AdminLogin() {
+  const { isAuthed, signIn } = useAdmin();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [error, setError] = useState(false);
-  const [signedIn, setSignedIn] = useState(false);
+
+  // Prefill the demo credentials so a pitch sign-in is one click.
+  useEffect(() => {
+    setEmail(ADMIN_EMAIL);
+    setPassword(ADMIN_PASSWORD);
+  }, []);
+
+  // Already signed in → straight to the console.
+  if (isAuthed) return <Navigate to="/admin/dashboard" replace />;
 
   const field =
     "min-h-[48px] w-full rounded-md border bg-surface-container/50 px-3.5 text-[15px] " +
@@ -24,7 +35,8 @@ export default function AdminLogin() {
     e.preventDefault();
     if (email.trim().toLowerCase() === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
       setError(false);
-      setSignedIn(true);
+      signIn();
+      navigate("/admin/dashboard");
     } else {
       setError(true);
     }
@@ -37,34 +49,7 @@ export default function AdminLogin() {
           <Logo />
         </div>
 
-        {signedIn ? (
-          <div className="rounded-xl border border-outline-variant/60 bg-white p-8 text-center shadow-soft">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-success/10 text-success">
-              <ShieldCheck className="h-7 w-7" aria-hidden="true" />
-            </span>
-            <h1 className="mt-4 font-display text-xl font-bold text-navy">Signed in</h1>
-            <p className="mt-2 text-muted">
-              Welcome back. The full admin dashboard — bookings, packages, inquiries, and CMS — is
-              being built in the next phase.
-            </p>
-            <div className="mt-6 flex items-center justify-center gap-3 rounded-md bg-surface-container p-4 text-sm text-muted">
-              <LayoutDashboard className="h-5 w-5 text-primary" aria-hidden="true" />
-              Dashboard coming soon
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setSignedIn(false);
-                setEmail("");
-                setPassword("");
-              }}
-              className="mt-6 inline-flex items-center gap-2 font-display font-bold text-primary hover:text-primary-dark"
-            >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              Sign out
-            </button>
-          </div>
-        ) : (
+        {(
           <div className="rounded-xl border border-outline-variant/60 bg-white p-8 shadow-soft">
             <div className="flex items-center gap-3">
               <span className="grid h-11 w-11 place-items-center rounded-full bg-navy text-white">
